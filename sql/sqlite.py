@@ -53,9 +53,10 @@ class SQLite:
 
 	async def addUUID(self, uuid: str):
 		await self.__DBExecute(f"""INSERT INTO "{self._table}" 
-								   (uuid) VALUES ('{uuid}');
+								   (uuid) VALUES ('{uuid}')
+								   ON CONFLICT DO NOTHING;
 								""",
-		f"[INFO] UUID: \"{uuid}\" added to db successfully!",
+		f"[INFO] UUID: \"{uuid}\" added/edited to db successfully!",
 		f"[WARNING] Add UUID \"{uuid}\" error!")
 
 	async def setPeopleCount(self, count: int):

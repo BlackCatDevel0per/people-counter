@@ -1,3 +1,4 @@
+aiosqlite==0.17.0
 asyncio==3.4.3
 asyncpg==0.25.0
 configparser==5.2.0
