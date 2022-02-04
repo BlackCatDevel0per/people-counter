@@ -23,8 +23,9 @@ cnt_down = 0
 
 #Fuente de video
 #cap = cv2.VideoCapture(0)
+
 #cap = cv2.VideoCapture('Test Files/TestVideo.avi')
-cap = cv2.VideoCapture('/home/bcdev/PythonProjects/people-counter/Test Files/TestVedeo2.mp4')
+cap = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
 #camera = PiCamera()
 ##camera.resolution = (160,120)
