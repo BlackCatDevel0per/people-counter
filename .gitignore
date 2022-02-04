@@ -1,0 +1,6 @@
+env/
+old/
+__pycache__
+*.pyc
+Test Files/TestVedeo2.mp4
+Test Files/TestVideo.avi
