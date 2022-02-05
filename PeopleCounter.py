@@ -219,7 +219,7 @@ while stream.isOpened():
 ##            frame = cv2.polylines(frame,[pts],False,i.getRGB())
 ##        if i.getId() == 9:
 ##            print str(i.getX()), ',', str(i.getY())
-		cv2.putText(frame, str(i.getId()),(i.getX(),i.getY()),font,0.3,i.getRGB(),1,cv2.LINE_AA)
+		cv2.putText(frame, str(i.getId()),(i.getX(),i.getY()),font,0.5,i.getRGB(),1,cv2.LINE_AA)
 		
 	##########################
 	#   Действия с кадрами   #
