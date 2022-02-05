@@ -238,6 +238,7 @@ while stream.isOpened():
 	new_frame_time = time.time()
 	fps = 1/(new_frame_time - prev_frame_time)
 	prev_frame_time = new_frame_time
+	print(fps)
 
 	fps = str(int(fps))
 	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
