@@ -1,147 +1,168 @@
-##Contador de personas
-##Federico Mejia
 ##from picamera.array import PiRGBArray
 ##from picamera import PiCamera
 import numpy as np
 import cv2
 import imutils
+from imutils.video import FPS
 import Person
+from config import Config
 import time
 
-# Options
-resize = 1.6 # for cam 2 for video 3
-rotate_degree = 90
+# Изменение настроек не применяются во время работы программы
+
+# Video Options
+#rotate_degree = 90
+#resize = 1.6 # for cam 2 for video 3
+resize = Config().get("resize")
+rotate_degree = Config().get("rotation")
+
+# Object Options
+rectangle_color = Config().get("rectangle_color")
+rectangle_thickness = Config().get("rectangle_thickness")
 
 try:
 	log = open('log.txt',"w")
 except:
-	print( "No se puede abrir el archivo log")
+	print("Не удалось открыть лог")
 
-#Contadores de entrada y salida
+# Переменные с счетчиками входа и выхода
 cnt_up   = 0
 cnt_down = 0
 
-#Fuente de video
-#cap = cv2.VideoCapture(0)
+# Источник видео
+#stream = cv2.VideoCapture(0)
 
-#cap = cv2.VideoCapture('Test Files/TestVideo.avi')
-cap = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
+#stream = cv2.VideoCapture("http://192.168.1.104:4747/video") # DroidCamX
+#stream = cv2.VideoCapture('Test Files/TestVideo.avi')
+stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
+# Size properties
+##stream.set(3,160) #Width
+##stream.set(4,120) #Height
+
+# FPS Timer start
+fps = FPS().start()
+
+# Raspberry Pi properties
 #camera = PiCamera()
 ##camera.resolution = (160,120)
 ##camera.framerate = 5
 ##rawCapture = PiRGBArray(camera, size=(160,120))
 ##time.sleep(0.1)
 
-#Propiedades del video
-##cap.set(3,160) #Width
-##cap.set(4,120) #Height
 
-#Imprime las propiedades de captura a consola
-for i in range(19):
-	print( i, cap.get(i))
+# Печать свойств захвата в консоль
+#for i in range(19):
+#	print(i, stream.get(i))
 
-h = 480
-w = 640
+# Отступ линий по высоте и ширине (лучше оставить по умолчанию 480, 640)
+#h = 480
+#w = 640
+h, w = Config().get("lines_pos")
 frameArea = h*w
 areaTH = frameArea/250
-print( 'Area Threshold', areaTH)
+#print('Area Threshold', areaTH)
 
-#Lineas de entrada/salida
+# Линии входа/выхода
 line_up = int(2*(h/5))
-line_down   = int(3*(h/5))
+line_down = int(3*(h/5))
 
-up_limit =   int(1*(h/5))
+up_limit = int(1*(h/5))
 down_limit = int(4*(h/5))
 
-print( "Red line y:",str(line_down))
-print( "Blue line y:", str(line_up))
-line_down_color = (255,0,0)
-line_up_color = (0,0,255)
-pt1 =  [0, line_down];
-pt2 =  [w, line_down];
+print("Red line y:", str(line_down))
+print("Blue line y:", str(line_up))
+#line_down_color = (255,0,0)
+#line_up_color = (0,0,255)
+line_down_color = Config().get("line_down_color")
+line_up_color = Config().get("line_up_color")
+pt1 = [0, line_down]
+pt2 = [w, line_down]
 pts_L1 = np.array([pt1,pt2], np.int32)
 pts_L1 = pts_L1.reshape((-1,1,2))
-pt3 =  [0, line_up];
-pt4 =  [w, line_up];
+pt3 = [0, line_up]
+pt4 = [w, line_up]
 pts_L2 = np.array([pt3,pt4], np.int32)
 pts_L2 = pts_L2.reshape((-1,1,2))
 
-pt5 =  [0, up_limit];
-pt6 =  [w, up_limit];
+pt5 = [0, up_limit]
+pt6 = [w, up_limit]
 pts_L3 = np.array([pt5,pt6], np.int32)
 pts_L3 = pts_L3.reshape((-1,1,2))
-pt7 =  [0, down_limit];
-pt8 =  [w, down_limit];
+pt7 = [0, down_limit]
+pt8 = [w, down_limit]
 pts_L4 = np.array([pt7,pt8], np.int32)
 pts_L4 = pts_L4.reshape((-1,1,2))
 
-#Substractor de fondo
+# Удаление теней
 fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows = True)
 
-#Elementos estructurantes para filtros morfoogicos
-kernelOp = np.ones((3,3),np.uint8)
-kernelOp2 = np.ones((5,5),np.uint8)
-kernelCl = np.ones((11,11),np.uint8)
+# Структурирующие элементы для морфологических фильтров
+kernelOp = np.ones((3,3), np.uint8)
+kernelOp2 = np.ones((5,5), np.uint8)
+kernelCl = np.ones((11,11), np.uint8)
 
-#Variables
+# Переменные *
 font = cv2.FONT_HERSHEY_SIMPLEX
 persons = []
 max_p_age = 5
 pid = 1
 
-while(cap.isOpened()):
+while(stream.isOpened()):
 ##for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-	#Lee una imagen de la fuente de video
-	ret, frame = cap.read()
+	# Чтение кадра из источника видео stream
+	grabbed, frame = stream.read()
+	if not grabbed:
+		break
 ##    frame = image.array
 
 	########################################
-	# Video operations
+	# Операции с входным видео
 	height, width, _ = frame.shape
 	frame = imutils.resize(frame, int(width // resize), int(height // resize)) # resize
 	frame = imutils.rotate_bound(frame, int(rotate_degree)) # rotate 
 	########################################
 
 	for i in persons:
-		i.age_one() #age every person one frame
-	#########################
-	#   PRE-PROCESAMIENTO   #
-	#########################
+		i.age_one() # Возраст  каждого человека за кадр
+	#################################
+	#   Предварительная обработка   #
+	#################################
 	
-	#Aplica substraccion de fondo
+	# Удаление фона
 	fgmask = fgbg.apply(frame)
 	fgmask2 = fgbg.apply(frame)
 
-	#Binariazcion para eliminar sombras (color gris)
+	# Преобразование в бинарный формат для удаления теней
 	try:
-		ret,imBin= cv2.threshold(fgmask,200,255,cv2.THRESH_BINARY)
-		ret,imBin2 = cv2.threshold(fgmask2,200,255,cv2.THRESH_BINARY)
-		#Opening (erode->dilate) para quitar ruido.
+		grabbed,imBin= cv2.threshold(fgmask,200,255,cv2.THRESH_BINARY)
+		grabbed,imBin2 = cv2.threshold(fgmask2,200,255,cv2.THRESH_BINARY)
+		# Открытие (размытие -> расширение) для удаления шума.
 		mask = cv2.morphologyEx(imBin, cv2.MORPH_OPEN, kernelOp)
 		mask2 = cv2.morphologyEx(imBin2, cv2.MORPH_OPEN, kernelOp)
-		#Closing (dilate -> erode) para juntar regiones blancas.
+		# Закрыть (расширение -> размытие) для соеденения белых областей.
 		mask =  cv2.morphologyEx(mask , cv2.MORPH_CLOSE, kernelCl)
 		mask2 = cv2.morphologyEx(mask2, cv2.MORPH_CLOSE, kernelCl)
 	except:
-		print('EOF')
-		print( 'UP:',cnt_up)
-		print ('DOWN:',cnt_down)
+		print('EOF') ###
+		print('ВЫШЛО:', cnt_up)
+		print ('ЗАШЛО:', cnt_down)
 		break
-	#################
-	#   CONTORNOS   #
-	#################
+	###############
+	#   Контуры   #
+	###############
 	
-	# RETR_EXTERNAL returns only extreme outer flags. All child contours are left behind.
+	# RETR_EXTERNAL возвращает только сжатые внешние флаги. Все дочерние контуры остаются позади.
 	contours0, hierarchy = cv2.findContours(mask2,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 	for cnt in contours0:
 		area = cv2.contourArea(cnt)
 		if area > areaTH:
-			#################
-			#   TRACKING    #
-			#################
+			##################
+			#  Отслеживание  #
+			##################
 			
-			#Falta agregar condiciones para multipersonas, salidas y entradas de pantalla.
+			# Пока нет исключений для определения и подсчёта нескольких человек (находящихся близко друг к другу)
+			# Но пока это и не нужно
 			
 			M = cv2.moments(cnt)
 			cx = int(M['m10']/M['m00'])
@@ -152,17 +173,17 @@ while(cap.isOpened()):
 			if cy in range(up_limit,down_limit):
 				for i in persons:
 					if abs(x-i.getX()) <= w and abs(y-i.getY()) <= h:
-						# el objeto esta cerca de uno que ya se detecto antes
+						# Объект похож на тот, что был ранее 
 						new = False
-						i.updateCoords(cx,cy)   #actualiza coordenadas en el objeto and resets age
+						i.updateCoords(cx,cy)   # Обновляет координаты объекта и сбрасывает возраст
 						if i.going_UP(line_down,line_up) == True:
-							cnt_up += 1;
-							print( "ID:",i.getId(),'crossed going up at',time.strftime("%c"))
-							log.write("ID: "+str(i.getId())+' crossed going up at ' + time.strftime("%c") + '\n')
+							cnt_up += 1
+							print("ID:",i.getId(), 'ВЫШЕЛ В -', time.strftime("%c"))
+							log.write("ID: " + str(i.getId()) + 'ВЫШЕЛ В -' + time.strftime("%c") + '\n')
 						elif i.going_DOWN(line_down,line_up) == True:
-							cnt_down += 1;
-							print( "ID:",i.getId(),'crossed going down at',time.strftime("%c"))
-							log.write("ID: " + str(i.getId()) + ' crossed going down at ' + time.strftime("%c") + '\n')
+							cnt_down += 1
+							print( "ID:",i.getId(),'ВОШЕЛ В -',time.strftime("%c"))
+							log.write("ID: " + str(i.getId()) + 'ВОШЕЛ В -' + time.strftime("%c") + '\n')
 						break
 					if i.getState() == '1':
 						if i.getDir() == 'down' and i.getY() > down_limit:
@@ -170,25 +191,26 @@ while(cap.isOpened()):
 						elif i.getDir() == 'up' and i.getY() < up_limit:
 							i.setDone()
 					if i.timedOut():
-						#sacar i de la lista persons
+						# Удалить i из списка человек
 						index = persons.index(i)
 						persons.pop(index)
-						del i     #liberar la memoria de i
+						del i     # Освобождения памяти от i
 				if new == True:
 					p = Person.MyPerson(pid,cx,cy, max_p_age)
 					persons.append(p)
 					pid += 1     
-			#################
-			#   DIBUJOS     #
-			#################
-			cv2.circle(frame,(cx,cy), 5, (0,0,255), -1)
-			img = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)            
-			#cv2.drawContours(frame, cnt, -1, (0,255,0), 3)
+			############################
+			#   Выделение человека     #
+			############################
+			cv2.circle(frame,(cx,cy), 5, (0,0,255), -1) # Точка в центре объекта
+			#img = cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2) # Рисование прямоугольника 
+			img = cv2.rectangle(frame,(x,y), (x+w,y+h), rectangle_color, rectangle_thickness) # Рисование прямоугольника 
+			#cv2.drawContours(frame, cnt, -1, (0,255,0), 3) # Рисование контуров объекта
 			
 	#END for cnt in contours0
 			
 	#########################
-	# DIBUJAR TRAYECTORIAS  #
+	#    Рисование пути     #
 	#########################
 	for i in persons:
 ##        if len(i.getTracks()) >= 2:
@@ -199,9 +221,9 @@ while(cap.isOpened()):
 ##            print str(i.getX()), ',', str(i.getY())
 		cv2.putText(frame, str(i.getId()),(i.getX(),i.getY()),font,0.3,i.getRGB(),1,cv2.LINE_AA)
 		
-	#################
-	#   IMAGANES    #
-	#################
+	##########################
+	#   Действия с кадрами   #
+	##########################
 	str_up = 'UP: '+ str(cnt_up)
 	str_down = 'DOWN: '+ str(cnt_down)
 	frame = cv2.polylines(frame,[pts_L1],False,line_down_color,thickness=2)
@@ -213,24 +235,23 @@ while(cap.isOpened()):
 	cv2.putText(frame, str_down ,(10,90),font,0.5,(255,255,255),2,cv2.LINE_AA)
 	cv2.putText(frame, str_down ,(10,90),font,0.5,(255,0,0),1,cv2.LINE_AA)
 
-	cv2.imshow('Frame',frame)
-	cv2.imshow('Mask',mask)    
+	cv2.imshow('Stream', frame)
+	#cv2.imshow('Mask', mask)    
+	fps.update()
 	
 
 	if cv2.waitKey(1) & 0xFF == ord('q'): # Завершение цикла на 'q'
 			break
-
-##    rawCapture.truncate(0)
-	#preisonar ESC para salir
-#    k = cv2.waitKey(30) & 0xff
-#    if k == 27:
-#        break
-#END while(cap.isOpened())
 	
-#################
-#   LIMPIEZA    #
-#################
+###############
+#   Очистка   #
+###############
 log.flush()
 log.close()
-cap.release()
+fps.stop()
+# Вывод FPS
+#print(f"Пройденное время: {round(fps.elapsed())}")
+print(f"Приблизительный FPS: {round(fps.fps())}")
+
+stream.release()
 cv2.destroyAllWindows()
