@@ -3,7 +3,6 @@
 import numpy as np
 import cv2
 import imutils
-from imutils.video import FPS
 import Person
 from config import Config
 import time
@@ -40,8 +39,9 @@ stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 ##stream.set(3,160) #Width
 ##stream.set(4,120) #Height
 
-# FPS Timer start
-fps = FPS().start()
+# fps
+prev_frame_time = 0
+new_frame_time = 0
 
 # Raspberry Pi properties
 #camera = PiCamera()
@@ -108,7 +108,7 @@ persons = []
 max_p_age = 5
 pid = 1
 
-while(stream.isOpened()):
+while stream.isOpened():
 ##for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 	# Чтение кадра из источника видео stream
 	grabbed, frame = stream.read()
@@ -230,14 +230,21 @@ while(stream.isOpened()):
 	frame = cv2.polylines(frame,[pts_L2],False,line_up_color,thickness=2)
 	frame = cv2.polylines(frame,[pts_L3],False,(255,255,255),thickness=1)
 	frame = cv2.polylines(frame,[pts_L4],False,(255,255,255),thickness=1)
-	cv2.putText(frame, str_up ,(10,40),font,0.5,(255,255,255),2,cv2.LINE_AA)
-	cv2.putText(frame, str_up ,(10,40),font,0.5,(0,0,255),1,cv2.LINE_AA)
-	cv2.putText(frame, str_down ,(10,90),font,0.5,(255,255,255),2,cv2.LINE_AA)
-	cv2.putText(frame, str_down ,(10,90),font,0.5,(255,0,0),1,cv2.LINE_AA)
+	cv2.putText(frame, str_up , (10,40), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+	cv2.putText(frame, str_up , (10,40), font, 0.5, (0,0,255), 1, cv2.LINE_AA)
+	cv2.putText(frame, str_down , (10,90), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+	cv2.putText(frame, str_down , (10,90), font, 0.5, (255,0,0), 1, cv2.LINE_AA)
+	# display realtime fps
+	new_frame_time = time.time()
+	fps = 1/(new_frame_time - prev_frame_time)
+	prev_frame_time = new_frame_time
+
+	fps = str(int(fps))
+	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+	###########################
 
 	cv2.imshow('Stream', frame)
 	#cv2.imshow('Mask', mask)    
-	fps.update()
 	
 
 	if cv2.waitKey(1) & 0xFF == ord('q'): # Завершение цикла на 'q'
@@ -248,10 +255,6 @@ while(stream.isOpened()):
 ###############
 log.flush()
 log.close()
-fps.stop()
-# Вывод FPS
-#print(f"Пройденное время: {round(fps.elapsed())}")
-print(f"Приблизительный FPS: {round(fps.fps())}")
 
 stream.release()
 cv2.destroyAllWindows()
