@@ -3,21 +3,22 @@ import time
 
 class MyPerson:
     tracks = []
-    def __init__(self, i, xi, yi, max_age):
+    def __init__(self, i, xi, yi, max_count):
         self.i = i
         self.x = xi
         self.y = yi
         self.tracks = []
-        self.R = randint(0,0)
-        self.G = randint(255,255)
-        self.B = randint(255,255)
+        self.R = randint(0,255)
+        self.G = randint(0,255)
+        self.B = randint(0,255)
         self.done = False
         self.state = '0'
-        self.age = 0
-        self.max_age = max_age
+        self.count = 0
+        self.max_count = max_count
         self.dir = None
     def getRGB(self):
-        return (self.R,self.G,self.B)
+        # Возвращает рандомный цвет
+        return (self.R, self.G, self.B)
     def getTracks(self):
         return self.tracks
     def getId(self):
@@ -31,15 +32,15 @@ class MyPerson:
     def getY(self):
         return self.y
     def updateCoords(self, xn, yn):
-        self.age = 0
-        self.tracks.append([self.x,self.y])
+        self.count = 0
+        self.tracks.append([self.x, self.y])
         self.x = xn
         self.y = yn
     def setDone(self):
         self.done = True
     def timedOut(self):
         return self.done
-    def going_UP(self,mid_start,mid_end):
+    def going_UP(self, mid_start, mid_end):
         if len(self.tracks) >= 2:
             if self.state == '0':
                 if self.tracks[-1][1] < mid_end and self.tracks[-2][1] >= mid_end: #cruzo la linea
@@ -50,7 +51,7 @@ class MyPerson:
                 return False
         else:
             return False
-    def going_DOWN(self,mid_start,mid_end):
+    def going_DOWN(self, mid_start, mid_end):
         if len(self.tracks) >= 2:
             if self.state == '0':
                 if self.tracks[-1][1] > mid_start and self.tracks[-2][1] <= mid_start: #cruzo la linea
@@ -61,19 +62,21 @@ class MyPerson:
                 return False
         else:
             return False
-    def age_one(self):
-        self.age += 1
-        if self.age > self.max_age:
+    def count_one(self):
+        self.count += 1
+        if self.count > self.max_count:
             self.done = True
         return True
+
+"""
 class MultiPerson:
     def __init__(self, persons, xi, yi):
         self.persons = persons
         self.x = xi
         self.y = yi
         self.tracks = []
-        self.R = randint(0,255)
-        self.G = randint(0,255)
-        self.B = randint(0,255)
+        self.R = randint(0, 255)
+        self.G = randint(0, 255)
+        self.B = randint(0, 255)
         self.done = False
-        
+"""

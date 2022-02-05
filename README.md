@@ -12,3 +12,5 @@ python PeopleCounter.py
 Threading
 PostgreSQL
 web interface
+Update system, distributing and etc.
+Multi person detection
