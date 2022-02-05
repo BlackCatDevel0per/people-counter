@@ -228,18 +228,19 @@ while stream.isOpened():
 	str_down = 'DOWN: '+ str(cnt_down)
 	frame = cv2.polylines(frame,[pts_L1],False,line_down_color,thickness=2)
 	frame = cv2.polylines(frame,[pts_L2],False,line_up_color,thickness=2)
-	frame = cv2.polylines(frame,[pts_L3],False,(255,255,255),thickness=1)
-	frame = cv2.polylines(frame,[pts_L4],False,(255,255,255),thickness=1)
-	cv2.putText(frame, str_up , (10,40), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
-	cv2.putText(frame, str_up , (10,40), font, 0.5, (0,0,255), 1, cv2.LINE_AA)
-	cv2.putText(frame, str_down , (10,90), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
-	cv2.putText(frame, str_down , (10,90), font, 0.5, (255,0,0), 1, cv2.LINE_AA)
+	frame = cv2.polylines(frame,[pts_L3],False,(255, 255, 255),thickness=1)
+	frame = cv2.polylines(frame,[pts_L4],False,(255, 255, 255),thickness=1)
+	cv2.putText(frame, str_up, (10, 40), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+	cv2.putText(frame, str_up, (10, 40), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+	cv2.putText(frame, str_down, (10, 90), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+	cv2.putText(frame, str_down, (10, 90), font, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
 	# display realtime fps
 	new_frame_time = time.time()
 	fps = 1/(new_frame_time - prev_frame_time)
 	prev_frame_time = new_frame_time
 
 	fps = str(int(fps))
+	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
 	###########################
 
