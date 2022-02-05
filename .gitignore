@@ -1,5 +1,6 @@
 env/
 old/
+log.txt
 __pycache__
 *.pyc
 Test Files/TestVedeo2.mp4
