@@ -1,15 +1,8 @@
 ##from picamera.array import PiRGBArray
 ##from picamera import PiCamera
-import numpy as np
 import cv2
-import imutils
-from config import Config
-import time
 
 # Изменение настроек не применяются во время работы программы
-
-# Object Options
-obj_number_font_size = Config().get("obj_number_font_size")
 
 # Источник видео
 #stream = cv2.VideoCapture(0)
@@ -19,19 +12,18 @@ obj_number_font_size = Config().get("obj_number_font_size")
 stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
 from vars import persons, pid, max_p_count
-from vars import pts_L1, pts_L2, pts_L3, pts_L4
-from vars import line_down_color, line_up_color
-from vars import line_down_bcolor, line_up_bcolor
-from vars import font
 from vars import log
-from vid import vidops
-from vid import binarize
-from vid import contours
+from frames import vidops
+from frames import binarize
+from frames import contours
+from frames import wdraw
+from frames import InfoDraw
 
+# People count vars
 cnt_up = 0
 cnt_down = 0
 
-# fps
+# fps vars
 prev_frame_time = 0
 new_frame_time = 0
 
@@ -45,14 +37,15 @@ while stream.isOpened():
 
 	frame = vidops(frame)
 
-	for i in persons:
-		i.count_one() # Слежение выхода за кадр каждого человека за кадр
+	for i in persons: # Слежение выхода за кадр каждого человека за кадр
+		i.count_one()
 
 
 	# Преобразование в бинарный формат для удаления теней
 	frame, mask, mask2 = binarize(frame, grabbed)
 	"""
 	try:
+		frame, mask, mask2 = binarize(frame, grabbed)
 	except Exception as e:
 		print(e)
 		print('EOF') ###
@@ -66,43 +59,14 @@ while stream.isOpened():
 		cnt_up += 1
 	elif is_down:
 		cnt_down += 1
-			
-	#########################
-	#    Рисование пути     #
-	#########################
-	for i in persons:
-##        if len(i.getTracks()) >= 2:
-##            pts = np.array(i.getTracks(), np.int32)
-##            pts = pts.reshape((-1, 1, 2))
-##            frame = cv2.polylines(frame, [pts], False, i.getRGB())
-##        if i.getId() == 9:
-##            print str(i.getX()), ',', str(i.getY())
-		cv2.putText(frame, str(i.getId()), (i.getX(), i.getY()), 
-					font, obj_number_font_size, i.getRGB(), 1, cv2.LINE_AA)
+
+	wdraw(frame, persons)
 		
-	##########################
-	#   Действия с кадрами   #
-	##########################
-	frame = cv2.polylines(frame, [pts_L1], False, line_down_color, thickness=2)
-	frame = cv2.polylines(frame, [pts_L2], False, line_up_color, thickness=2)
-	frame = cv2.polylines(frame, [pts_L3], False, line_down_bcolor, thickness=1)
-	frame = cv2.polylines(frame, [pts_L4], False, line_up_bcolor, thickness=1)
-	str_up = 'UP: '+ str(cnt_up)
-	str_down = 'DOWN: '+ str(cnt_down)
-	cv2.putText(frame, str_up, (10, 40), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-	cv2.putText(frame, str_up, (10, 40), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-	cv2.putText(frame, str_down, (10, 90), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-	cv2.putText(frame, str_down, (10, 90), font, 0.5, (255, 0, 0), 1, cv2.LINE_AA)
-	# display realtime fps
-	new_frame_time = time.time()
-	fps = 1/(new_frame_time - prev_frame_time)
-	prev_frame_time = new_frame_time
+	frame = InfoDraw.lines(frame)
+	frame = InfoDraw.way(frame, cnt_up, cnt_down)
+	new_frame_time, prev_frame_time = InfoDraw.fps(frame, (prev_frame_time, new_frame_time))
 
-	fps = str(int(fps))
-	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-	cv2.putText(frame, f"FPS: {fps}", (220, 25), font, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-	###########################
-
+	# Вывод кадров
 	cv2.imshow('Stream', frame)
 	#cv2.imshow('Mask', mask)    
 	
