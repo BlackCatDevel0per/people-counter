@@ -40,17 +40,16 @@ while stream.isOpened():
         i.age_one()
 
     # Преобразование в бинарный формат для удаления теней
-    frame, mask, mask2 = binarize(frame, grabbed)
-    """
+    #frame, mask, mask2 = binarize(frame, grabbed)
 	try:
+    	# Преобразование в бинарный формат для удаления теней
 		frame, mask, mask2 = binarize(frame, grabbed)
 	except Exception as e:
-		print(e)
 		print('EOF') ###
 		print('ВЫШЛО:', cnt_up)
-		print ('ЗАШЛО:', cnt_down)
+		print('ЗАШЛО:', cnt_down)
+		print(e)
 		break
-	"""
 
     frame, is_up, is_down = contours(frame, mask2, persons, pid, max_p_age)
     if is_up:
@@ -68,7 +67,7 @@ while stream.isOpened():
 
     # Вывод кадров
     cv2.imshow('Stream', frame)
-    #cv2.imshow('Mask', mask)
+    cv2.imshow('Mask', mask)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
         break
