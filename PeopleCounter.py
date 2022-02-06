@@ -11,8 +11,8 @@ import cv2
 #stream = cv2.VideoCapture('Test Files/TestVideo.avi')
 stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
-from vars import persons, pid, max_p_count
-from vars import log
+from nonloopvars import persons, pid, max_p_count
+from nonloopvars import log
 from frames import vidops
 from frames import binarize
 from frames import contours
@@ -26,6 +26,9 @@ cnt_down = 0
 # fps vars
 prev_frame_time = 0
 new_frame_time = 0
+
+print("Red line y:", str(line_down))
+print("Blue line y:", str(line_up))
 
 while stream.isOpened():
 ##for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):

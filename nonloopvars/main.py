@@ -13,6 +13,7 @@ from config import Config
 ##rawCapture = PiRGBArray(camera, size=(160, 120))
 ##time.sleep(0.1)
 
+# Open logfile
 try:
 	log = open('log.txt', "w")
 except:
@@ -37,8 +38,6 @@ line_down = int(3*(h/5))
 up_limit = int(1*(h/5))
 down_limit = int(4*(h/5))
 
-print("Red line y:", str(line_down))
-print("Blue line y:", str(line_up))
 #line_down_color = (255, 0, 0)
 #line_up_color = (0, 0, 255)
 line_down_color = Config().get("line_down_color")
