@@ -6,9 +6,9 @@ from nonloopvars import font
 from nonloopvars import rectangle_color, rectangle_thickness, obj_number_font_size
 
 class ObjInfoDraw:
-	############################
-	#   Выделение человека     #
-	############################
+	#########################
+	#   Выделение объекта   #
+	#########################
 	def __init__(self, frame):
 		self.frame = frame
 

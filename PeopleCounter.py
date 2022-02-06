@@ -15,7 +15,7 @@ from nonloopvars import persons, pid, max_p_age
 from nonloopvars import log
 from frames import vidops
 from frames import binarize
-from frames import contours
+from frames import detect
 from frames import InfoDraw
 
 # Импорт переменных счётчиков
@@ -27,22 +27,22 @@ print("Red line y:", str(line_down))
 print("Blue line y:", str(line_up))
 
 while stream.isOpened():
-    # for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    # Чтение кадра из источника видео stream
-    grabbed, frame = stream.read()
-    if not grabbed:
-        break
-    #frame = image.array
+	# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+	# Чтение кадра из источника видео stream
+	grabbed, frame = stream.read()
+	if not grabbed:
+		break
+	#frame = image.array
 
-    frame = vidops(frame)
+	frame = vidops(frame)
 
-    for i in persons:  # Слежение выхода за кадр каждого человека за кадр
-        i.age_one()
+	for i in persons:  # Слежение выхода за кадр каждого объекта за кадр
+		i.age_one()
 
-    # Преобразование в бинарный формат для удаления теней
-    #frame, mask, mask2 = binarize(frame, grabbed)
+	# Преобразование в бинарный формат для удаления теней
+	#frame, mask, mask2 = binarize(frame, grabbed)
 	try:
-    	# Преобразование в бинарный формат для удаления теней
+		# Преобразование в бинарный формат для удаления теней
 		frame, mask, mask2 = binarize(frame, grabbed)
 	except Exception as e:
 		print('EOF') ###
@@ -51,26 +51,27 @@ while stream.isOpened():
 		print(e)
 		break
 
-    frame, is_up, is_down = contours(frame, mask2, persons, pid, max_p_age)
-    if is_up:
-        cnt_up += 1
-    elif is_down:
-        cnt_down += 1
+	# Возвращает в переменные is_up, is_down True, если объект пересёк линию
+	frame, is_up, is_down = detect(frame, mask2, persons, pid, max_p_age)
+	if is_up:
+		cnt_up += 1
+	elif is_down:
+		cnt_down += 1
 
-    # Рисование линий счётчика (на его работу не влияет)
-    frame = InfoDraw.lines(frame)
-    # Рисование счётчиков UP и DOWN
-    frame = InfoDraw.count(frame, cnt_up, cnt_down)
-    # Переменные для работы счётчика fps
-    new_frame_time, prev_frame_time = InfoDraw.fps(
-        frame, (prev_frame_time, new_frame_time))
+	# Рисование линий счётчика (на его работу не влияет)
+	frame = InfoDraw.lines(frame)
+	# Рисование счётчиков UP и DOWN
+	frame = InfoDraw.count(frame, cnt_up, cnt_down)
+	# Переменные для работы счётчика fps
+	new_frame_time, prev_frame_time = InfoDraw.fps(
+		frame, (prev_frame_time, new_frame_time))
 
-    # Вывод кадров
-    cv2.imshow('Stream', frame)
-    cv2.imshow('Mask', mask)
+	# Вывод кадров
+	cv2.imshow('Stream', frame)
+	#cv2.imshow('Mask', mask)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
-        break
+	if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
+		break
 
 ###############
 #   Очистка   #

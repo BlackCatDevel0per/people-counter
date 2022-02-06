@@ -5,14 +5,12 @@ import Person
 
 from .obj_info_drawing import ObjInfoDraw
 
-def contours(frame, mask2, persons, pid, max_p_age):
+def detect(frame, mask2, persons, pid, max_p_age):
 
 	is_up   = False
 	is_down = False
 
-	###############
-	#   Контуры   #
-	###############
+	# Контуры
 	
 	# RETR_EXTERNAL возвращает только сжатые внешние флаги. Все дочерние контуры остаются позади.
 	contours0, hierarchy = cv2.findContours(mask2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
