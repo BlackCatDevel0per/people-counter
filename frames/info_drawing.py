@@ -1,10 +1,10 @@
 import cv2
 import time
-from vars import font
+from nonloopvars import font
 
-from vars import line_down_color, line_up_color
-from vars import line_down_bcolor, line_up_bcolor
-from vars import pts_L1, pts_L2, pts_L3, pts_L4
+from nonloopvars import line_down_color, line_up_color
+from nonloopvars import line_down_bcolor, line_up_bcolor
+from nonloopvars import pts_L1, pts_L2, pts_L3, pts_L4
 
 class InfoDraw:
 	##########################
@@ -20,7 +20,7 @@ class InfoDraw:
 		
 		return frame
 
-	def way(frame, cnt_up, cnt_down):
+	def count(frame, cnt_up, cnt_down):
 		# Рисование счетчиков UP и DOWN
 		str_up = 'UP: '+ str(cnt_up)
 		str_down = 'DOWN: '+ str(cnt_down)

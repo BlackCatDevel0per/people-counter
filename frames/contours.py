@@ -1,14 +1,11 @@
 import cv2
 import time
-from vars import areaTH, up_limit, down_limit, line_down, line_up, log
+from nonloopvars import areaTH, up_limit, down_limit, line_down, line_up, log
 import Person
-from config import Config
 
-# Object Options
-rectangle_color = Config().get("rectangle_color")
-rectangle_thickness = Config().get("rectangle_thickness")
+from .obj_info_drawing import ObjInfoDraw
 
-def contours(frame, mask2, persons, pid, max_p_count):
+def contours(frame, mask2, persons, pid, max_p_age):
 
 	is_up   = False
 	is_down = False
@@ -40,7 +37,7 @@ def contours(frame, mask2, persons, pid, max_p_count):
 					if abs(x-i.getX()) <= w and abs(y-i.getY()) <= h:
 						# Объект похож на тот, что был ранее 
 						new = False
-						i.updateCoords(cx, cy)   # Обновляет координаты объекта и сбрасывает возраст
+						i.updateCoords(cx, cy)   # Обновляет координаты объекта и сбрасывает счётчик
 						if i.going_UP(line_down, line_up) == True:
 							is_up = True
 							print("ID:", i.getId(), 'ВЫШЕЛ В -', time.strftime("%c"))
@@ -59,18 +56,20 @@ def contours(frame, mask2, persons, pid, max_p_count):
 						# Удалить i из списка человек
 						index = persons.index(i)
 						persons.pop(index)
-						del i     # Удаление из переменной i из памяти
+						del i # Удаление переменной i из памяти
 				if new == True:
-					p = Person.MyPerson(pid, cx, cy, max_p_count)
+					p = Person.MyPerson(pid, cx, cy, max_p_age)
 					persons.append(p)
 					pid += 1
-			############################
-			#   Выделение человека     #
-			############################
-			cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1) # Точка в центре объекта
-			#img = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2) # Рисование прямоугольника 
-			img = cv2.rectangle(frame, (x, y), (x+w, y+h), rectangle_color, rectangle_thickness) # Рисование прямоугольника 
-			#cv2.drawContours(frame, cnt, -1, (0, 255, 0), 3) # Рисование контуров объекта
+
+			# Рисование точки(круга)
+			ObjInfoDraw(frame).circle(cx, cy)
+			# Рисование прямоугольника
+			ObjInfoDraw(frame).rectangle((x, y), (w, h))
+			# Рисование пути объекта линеей 
+			#ObjInfoDraw(frame).way(persons)
+			# Рисование id объекта 
+			ObjInfoDraw(frame).id(persons)
 			
 	#END for cnt in contours0
 	return frame, is_up, is_down

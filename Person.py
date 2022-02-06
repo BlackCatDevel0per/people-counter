@@ -8,12 +8,14 @@ class MyPerson:
         self.x = xi
         self.y = yi
         self.tracks = []
+        # Рандомный цвет
         self.R = randint(0,255)
         self.G = randint(0,255)
         self.B = randint(0,255)
-        self.done = False
+        #
+        self.done = False # При True перестаёт следить за объектом
         self.state = '0'
-        self.count = 0
+        self.age = 0
         self.max_count = max_count
         self.dir = None
     def getRGB(self):
@@ -32,7 +34,7 @@ class MyPerson:
     def getY(self):
         return self.y
     def updateCoords(self, xn, yn):
-        self.count = 0
+        self.age = 0
         self.tracks.append([self.x, self.y])
         self.x = xn
         self.y = yn
@@ -43,7 +45,7 @@ class MyPerson:
     def going_UP(self, mid_start, mid_end):
         if len(self.tracks) >= 2:
             if self.state == '0':
-                if self.tracks[-1][1] < mid_end and self.tracks[-2][1] >= mid_end: #cruzo la linea
+                if self.tracks[-1][1] < mid_end and self.tracks[-2][1] >= mid_end: # переходит черту
                     state = '1'
                     self.dir = 'up'
                     return True
@@ -54,7 +56,7 @@ class MyPerson:
     def going_DOWN(self, mid_start, mid_end):
         if len(self.tracks) >= 2:
             if self.state == '0':
-                if self.tracks[-1][1] > mid_start and self.tracks[-2][1] <= mid_start: #cruzo la linea
+                if self.tracks[-1][1] > mid_start and self.tracks[-2][1] <= mid_start: # переходит черту
                     state = '1'
                     self.dir = 'down'
                     return True
@@ -62,10 +64,11 @@ class MyPerson:
                 return False
         else:
             return False
-    def count_one(self):
-        self.count += 1
-        if self.count > self.max_count:
-            self.done = True
+
+    def age_one(self):
+        self.age += 1
+        if self.age > self.max_count:
+            self.done = True # Закончить отслеживание объекта
         return True
 
 """

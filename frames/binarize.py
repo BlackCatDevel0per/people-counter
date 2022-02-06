@@ -1,5 +1,5 @@
 import cv2
-from vars import fgbg, kernelOp, kernelCl
+from nonloopvars import fgbg, kernelOp, kernelCl
 
 def binarize(frame, grabbed):
 

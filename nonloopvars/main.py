@@ -44,6 +44,12 @@ line_down_color = Config().get("line_down_color")
 line_down_bcolor = Config().get("line_down_bcolor")
 line_up_color = Config().get("line_up_color")
 line_up_bcolor = Config().get("line_up_bcolor")
+
+# Object Options
+rectangle_color = Config().get("rectangle_color")
+rectangle_thickness = Config().get("rectangle_thickness")
+obj_number_font_size = Config().get("obj_number_font_size")
+
 pt1 = [0, line_down]
 pt2 = [w, line_down]
 pts_L1 = np.array([pt1, pt2], np.int32)
@@ -62,7 +68,7 @@ pt8 = [w, down_limit]
 pts_L4 = np.array([pt7, pt8], np.int32)
 pts_L4 = pts_L4.reshape((-1, 1, 2))
 
-# Удаление теней
+# Удаление теней и фона
 fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows = True)
 
 # Структурирующие элементы для морфологических фильтров
@@ -73,5 +79,15 @@ kernelCl = np.ones((11, 11), np.uint8)
 # Vars *
 font = cv2.FONT_HERSHEY_SIMPLEX
 persons = []
-max_p_count = 5
+# Если кол. человек в списке persons становится больше max_p_age, то он удаляет из него элемент
+# Макс. время(тик) ожидания выхода человека за пределы кадра
+max_p_age = 5
 pid = 1
+
+# People count vars
+cnt_up = 0
+cnt_down = 0
+
+# fps vars
+prev_frame_time = 0
+new_frame_time = 0
