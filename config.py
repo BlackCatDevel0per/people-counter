@@ -55,12 +55,19 @@ class Config:
     def set_LineUpColor(self, thickness: int):
         self._tmp_set("LINES", "rectangle_thickness", str(thickness))
 
-    def PostgreSQL(self, type: str):
-        self.self.config.read(self.PostgreSQL_File)
+    def PostgreSQL(self, arg: str):
+        self.config.read(self.PostgreSQL_File)
         data = None
 
-        host = str(self.PostgreSQL_File["PSQL"]["host"])
-        port = str(self.PostgreSQL_File["PSQL"]["port"])
+        host = str(self.config["PGSQL"]["host"])
+        port = int(self.config["PGSQL"]["port"])
 
-        login = str(self.PostgreSQL_File["PSQL"]["login"])
-        password = str(self.PostgreSQL_File["PSQL"]["password"])
+        db = str(self.config["PGSQL"]["db"])
+        table = str(self.config["PGSQL"]["table"])
+
+        user = str(self.config["PGSQL"]["user"])
+        password = str(self.config["PGSQL"]["password"])
+
+        data = eval(arg)
+
+        return data

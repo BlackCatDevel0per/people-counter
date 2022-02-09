@@ -1,5 +1,7 @@
-[PSQL]
+[PGSQL]
 host = your.host
 port = 5432
-login = login_name
+user = login_name
+db = MyDB
+table = PCDB
 password = PaSsW0Rd
