@@ -8,14 +8,16 @@ class Config:
         self.app_name = "People Counter"
         self.app_version = "Alpha 1.0"
         self.config = configparser.ConfigParser()  # создаём объекта парсера
-        self.conf = os.path.join(self.app_path, 'src', 'data', 'config.ini')
+        self.settings = os.path.join(self.app_path, 'src', 'data', 'settings.ini')
+        self.PostgreSQL_File = os.path.join(self.app_path, 'src', 'data', 'PostgreSQL.ini')
 
     def get(self, args: str):
-        self.config.read(self.conf)  # читаем конфиг
+        #############
+        self.config.read(self.settings)  # читаем конфиг
         data = None
 
-        rotation = str(self.config["VIDEO"]["rotation"])
-        resize = str(self.config["VIDEO"]["resize"])
+        rotation = int(self.config["VIDEO"]["rotation"])
+        resize = float(self.config["VIDEO"]["resize"])
 
         line_down_color = eval(self.config["LINES"]["line_down_color"])
         line_down_bcolor = eval(self.config["LINES"]["line_down_bcolor"])
@@ -27,42 +29,15 @@ class Config:
         rectangle_thickness = int(self.config["OBJECT"]["rectangle_thickness"])
         obj_number_font_size = float(self.config["OBJECT"]["obj_number_font_size"])
 
-        if args == "rotation":  # in python 3.10 will be updated to switch case
-            data = int(rotation)
-        elif args == "resize":
-            data = float(resize)
-        elif args == "line_down_color":
-            # tuple BGR
-            data = line_down_color
-        elif args == "line_down_bcolor":
-            # tuple BGR
-            data = line_down_bcolor
-        elif args == "line_up_color":
-            # tuple BGR
-            data = line_up_color
-        elif args == "line_up_bcolor":
-            # tuple BGR
-            data = line_up_bcolor
-        elif args == "lines_pos":
-            # tuple h, w
-            data = lines_pos
-        elif args == "rectangle_color":
-            # tuple BGR
-            data = rectangle_color
-        elif args == "rectangle_thickness":
-            data = rectangle_thickness
-        elif args == "obj_number_font_size":
-            data = obj_number_font_size
-        else:
-            data = None
+        data = eval(args) # Return result like a dictonary
 
         return data
 
     def _tmp_set(self, arg1: str, arg2: str, arg3):
-        self.config.read(self.conf)
+        self.config.read(self.settings)
         self.config.set(arg1, arg2, str(arg3))
-        with open(self.conf, "r") as conf_file:
-            self.config.write(open(self.conf, "w"))
+        with open(self.settings, "r") as conf_file:
+            self.config.write(open(self.settings, "w"))
 
     def set_VideoRotation(self, degree: int):
         self._tmp_set("VIDEO", "rotation", str(degree))
@@ -79,3 +54,13 @@ class Config:
 
     def set_LineUpColor(self, thickness: int):
         self._tmp_set("LINES", "rectangle_thickness", str(thickness))
+
+    def PostgreSQL(self, type: str):
+        self.self.config.read(self.PostgreSQL_File)
+        data = None
+
+        host = str(self.PostgreSQL_File["PSQL"]["host"])
+        port = str(self.PostgreSQL_File["PSQL"]["port"])
+
+        login = str(self.PostgreSQL_File["PSQL"]["login"])
+        password = str(self.PostgreSQL_File["PSQL"]["password"])

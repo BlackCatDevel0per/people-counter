@@ -1,0 +1,5 @@
+[PSQL]
+host = your.host
+port = 5432
+login = login_name
+password = PaSsW0Rd
