@@ -1,0 +1,29 @@
+import asyncio
+from config import Config
+from sql import PGSQL
+from sql import generate_uuid
+
+import time
+
+#print(Config().PostgreSQL("host"))
+
+loop = asyncio.get_event_loop()
+
+uuid = generate_uuid()
+
+#loop.run_until_complete(PGSQL().createTable("PCDB"))
+loop.run_until_complete(PGSQL(uuid=uuid).addAllCNT(7, "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
+"""
+#loop.run_until_complete(PGSQL().createTable("PCDB"))
+loop.run_until_complete(PGSQL().addUUID(uuid))
+loop.run_until_complete(PGSQL(uuid=uuid).setPeopleCount(10))
+loop.run_until_complete(PGSQL(uuid=uuid).setBusNumber("E777"))
+loop.run_until_complete(PGSQL(uuid=uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
+#loop.run_until_complete(PGSQL(uuid="8601fed3-14ef-4dec-bb5f-7e22b6bc7636").setPeopleCount(10))
+"""
+
+#loop.run_until_complete(PGSQL().addUUID(generate_uuid()))
+#loop.run_until_complete(PGSQL(uuid=generate_uuid()).createTable("PCDB"))
+#loop.run_until_complete(PGSQL(uuid="777").createTable("PCDB"))
+#loop.run_until_complete(PGSQL().setPeopleCount(10))
+#loop.run_until_complete(PGSQL().setBusNumber("E777"))

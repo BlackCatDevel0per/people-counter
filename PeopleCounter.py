@@ -26,7 +26,7 @@ from nonloopvars import line_down, line_up
 print("Red line y:", str(line_down))
 print("Blue line y:", str(line_up))
 
-from sql import PGSQL
+#from sql import PGSQL
 
 while stream.isOpened():
 	# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):

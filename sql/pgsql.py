@@ -50,7 +50,7 @@ class PGSQL:
 		try:
 			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
 			async with connection.transaction():
-				await connection.execute(f"""INSERT INTO {self._table} \
+				await connection.execute(f"""INSERT INTO "{self._table}" \
 										     (uuid) VALUES ('{uuid}');\
 										  """)
 				print(f"[INFO] UUID: \"{uuid}\" added to db successfully!")
@@ -62,7 +62,7 @@ class PGSQL:
 		try:
 			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
 			async with connection.transaction():
-				await connection.execute(f"""UPDATE {self._table} \
+				await connection.execute(f"""UPDATE "{self._table}" \
 											 SET count = {count} \
 											 WHERE uuid = '{self._current_uuid}';
 										  """)
@@ -75,7 +75,7 @@ class PGSQL:
 		try:
 			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
 			async with connection.transaction():
-				await connection.execute(f"""UPDATE {self._table} \
+				await connection.execute(f"""UPDATE "{self._table}" \
 										   	 SET bus_number = '{number}' \
 										   	 WHERE uuid = '{self._current_uuid}';
 										  """)
@@ -88,7 +88,7 @@ class PGSQL:
 		try:
 			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
 			async with connection.transaction():
-				await connection.execute(f"""UPDATE {self._table} \
+				await connection.execute(f"""UPDATE "{self._table}" \
 										   	 SET time = '{time}' \
 										   	 WHERE uuid = '{self._current_uuid}';
 										  """)
@@ -96,3 +96,14 @@ class PGSQL:
 
 		except Exception as e:
 			print(f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!\n{e}")
+##############################
+
+	async def addAllCNT(self, count: int, number: str, time: str):
+		try:
+			await self.addUUID(self._current_uuid)
+			await self.setPeopleCount(count)
+			await self.setBusNumber(number)
+			await self.setTime(time)
+			print("[INFO] DONE!")
+		except Exception as e:
+			print(f"[FAIL!] Add count, bus_number, time \"{count, number, time}\"->\"{self._current_uuid}\" failed!\n{e}")

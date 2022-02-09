@@ -1,4 +1,7 @@
+asyncio==3.4.3
+asyncpg==0.25.0
 configparser==5.2.0
 imutils==0.5.4
 numpy==1.21.5
 opencv-python==4.5.5.62
+typing_extensions==4.0.1

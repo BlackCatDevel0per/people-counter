@@ -1,7 +1,6 @@
 env/
 old/
 src/data/PostgreSQL.ini
-test.py
 log.txt
 __pycache__
 *.pyc

@@ -29,6 +29,8 @@ class Config:
         rectangle_thickness = int(self.config["OBJECT"]["rectangle_thickness"])
         obj_number_font_size = float(self.config["OBJECT"]["obj_number_font_size"])
 
+        send_count_interval = int(self.config["DB"]["send_count_interval"])
+
         data = eval(args) # Return result like a dictonary
 
         return data
@@ -54,6 +56,10 @@ class Config:
 
     def set_LineUpColor(self, thickness: int):
         self._tmp_set("LINES", "rectangle_thickness", str(thickness))
+
+
+    def setSendCountInterval(self, interval: int):
+        self._tmp_set("DB", "send_count_interval", str(interval))
 
     def PostgreSQL(self, arg: str):
         self.config.read(self.PostgreSQL_File)
