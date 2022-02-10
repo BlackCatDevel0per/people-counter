@@ -10,6 +10,7 @@ class Config:
         self.config = configparser.ConfigParser()  # создаём объекта парсера
         self.settings = os.path.join(self.app_path, 'src', 'data', 'settings.ini')
         self.PostgreSQL_File = os.path.join(self.app_path, 'src', 'data', 'PostgreSQL.ini')
+        self.SQLite_File = os.path.join(self.app_path, 'src', 'data', 'SQLite.ini')
 
     def get(self, args: str):
         #############
@@ -73,6 +74,20 @@ class Config:
 
         user = str(self.config["PGSQL"]["user"])
         password = str(self.config["PGSQL"]["password"])
+
+        data = eval(arg)
+
+        return data
+
+    def SQLite(self, arg: str):
+        self.config.read(self.SQLite_File)
+        data = None
+
+        db = str(self.config["SQLite"]["db"])
+        table = str(self.config["SQLite"]["table"])
+
+        #user = str(self.config["SQLite"]["user"])
+        #password = str(self.config["SQLite"]["password"])
 
         data = eval(arg)
 

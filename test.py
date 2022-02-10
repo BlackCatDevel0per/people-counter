@@ -1,6 +1,7 @@
 import asyncio
 from config import Config
 from sql import PGSQL
+from sql import SQLite
 from sql import generate_uuid
 
 import time
@@ -11,8 +12,15 @@ loop = asyncio.get_event_loop()
 
 uuid = generate_uuid()
 
+loop.run_until_complete(SQLite().addUUID(uuid))
+loop.run_until_complete(SQLite(uuid=uuid).setPeopleCount(15))
+loop.run_until_complete(SQLite(uuid=uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
+#loop.run_until_complete(SQLite().createTable("local"))
+
+
 #loop.run_until_complete(PGSQL().createTable("PCDB"))
-loop.run_until_complete(PGSQL(uuid=uuid).addAllCNT(7, "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
+#loop.run_until_complete(PGSQL().addAllCNT(7, "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
+#loop.run_until_complete(PGSQL(uuid=uuid).addAllCNT(7, "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
 """
 #loop.run_until_complete(PGSQL().createTable("PCDB"))
 loop.run_until_complete(PGSQL().addUUID(uuid))

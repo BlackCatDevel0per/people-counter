@@ -7,7 +7,7 @@ from config import Config
 
 class PGSQL:
 
-	def __init__(self, table=None, uuid=None):
+	def __init__(self, uuid=None, table=None):
 		self._host = Config().PostgreSQL("host")
 		self._port = Config().PostgreSQL("port")
 		self._user = Config().PostgreSQL("user")
@@ -25,7 +25,7 @@ class PGSQL:
 		else:
 			print("uuid get error")
 
-	async def __DBTrabsactionExecute(self, request: str, debug: str = None, exception_text: str = None, EXTYPE: type = Exception):
+	async def __DBTransactionExecute(self, request: str, debug: str = None, exception_text: str = None, EXTYPE: type = Exception):
 		try:
 			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
 			async with connection.transaction():
@@ -50,8 +50,8 @@ class PGSQL:
 		#print(f"[INFO] UUID: {self._current_uuid}") # OK!
 		#if self._table != None:
 		#	return False
-	
-		await self.__DBTrabsactionExecute(f"""CREATE TABLE {name} \
+		
+		await self.__DBTransactionExecute(f"""CREATE TABLE {name} \
 										      (\
 										      uuid VARCHAR(38) PRIMARY KEY, \
 										      bus_number VARCHAR(32),\
@@ -62,8 +62,9 @@ class PGSQL:
 										      f"[WARNING] Create table \"{name}\" error!")
 
 ##############################
+
 	async def addUUID(self, uuid: str):
-		await self.__DBTrabsactionExecute(f"""INSERT INTO "{self._table}" \
+		await self.__DBTransactionExecute(f"""INSERT INTO "{self._table}" \
 								     		  (uuid) VALUES ('{uuid}');\
 								  	 	   """,
 		f"[INFO] UUID: \"{uuid}\" added to db successfully!",
@@ -71,7 +72,7 @@ class PGSQL:
 
 ###
 	async def setPeopleCount(self, count: int):
-		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+		await self.__DBTransactionExecute(f"""UPDATE "{self._table}" \
 											  SET count = {count} \
 									    	  WHERE uuid = '{self._current_uuid}';
 									 	   """,
@@ -79,7 +80,7 @@ class PGSQL:
  	   f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!")
 ###
 	async def setBusNumber(self, number: str):
-		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+		await self.__DBTransactionExecute(f"""UPDATE "{self._table}" \
 									  	 	  SET bus_number = '{number}' \
 									  		  WHERE uuid = '{self._current_uuid}';
 									 	   """,
@@ -87,12 +88,24 @@ class PGSQL:
  	   f"[WARNING] Add bus number \"{number}\"->\"{self._current_uuid}\" error!")
 ###
 	async def setTime(self, time: str):
-		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+		await self.__DBTransactionExecute(f"""UPDATE "{self._table}" \
 									   		  SET time = '{time}' \
 									   		  WHERE uuid = '{self._current_uuid}';
 									 	   """, 
  	   f"[INFO] Time \"{time}\"->\"{self._current_uuid}\" added to db successfully!", 
  	   f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!")
+
+##############################
+##############################
+
+	# Get functions ...
+	"""
+	Example
+	SELECT uuid
+	FROM "pcdb"
+	WHERE count = 7
+	LIMIT 1
+	"""
 
 ##############################
 
