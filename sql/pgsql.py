@@ -25,77 +25,73 @@ class PGSQL:
 		else:
 			print("uuid get error")
 
+	async def __DBTrabsactionExecute(self, request: str, debug: str = None, exception_text: str = None):
+		try:
+			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
+			async with connection.transaction():
+				await connection.execute(request)
+				if debug != None: print(debug)
+
+		except Exception as e:
+			print(e)
+			if exception_text != None: print(exception_text)
+
+		finally:
+			#print("[DEBUG] Close connection")
+			await connection.close()
+
 	async def createTable(self, name: str):
 		try:
 			#print(f"[INFO] UUID: {self._current_uuid}") # OK!
 			#if self._table != None:
 			#	return False
-			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
-			async with connection.transaction():
-				await connection.execute(f"""CREATE TABLE {name} \
-										   (\
-										   uuid VARCHAR(38) PRIMARY KEY, \
-										   bus_number VARCHAR(32),\
-										   count INTEGER, \
-										   time VARCHAR(32) \
-										   );""")
-				print(f"[INFO] Table \"{name}\" created successfully!")
+		
+			await self.__DBTrabsactionExecute(f"""CREATE TABLE {name} \
+											      (\
+											      uuid VARCHAR(38) PRIMARY KEY, \
+											      bus_number VARCHAR(32),\
+											      count INTEGER, \
+											      time VARCHAR(32) \
+											      );""",
+											      None,
+											      f"[WARNING] Create table \"{name}\" error!")
+			print(f"[INFO] Table \"{name}\" created successfully!")
 		except asyncpg.exceptions.DuplicateTableError:
 			print(f"[INFO] Table \"{name}\" exists!")
 
-		except Exception as e:
-			print(f"[WARNING] Create table \"{name}\" error!\n{e}")
 ##############################
 	async def addUUID(self, uuid: str):
-		try:
-			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
-			async with connection.transaction():
-				await connection.execute(f"""INSERT INTO "{self._table}" \
-										     (uuid) VALUES ('{uuid}');\
-										  """)
-				print(f"[INFO] UUID: \"{uuid}\" added to db successfully!")
+		await self.__DBTrabsactionExecute(f"""INSERT INTO "{self._table}" \
+								     		  (uuid) VALUES ('{uuid}');\
+								  	 	   """,
+								  	 	   f"[INFO] UUID: \"{uuid}\" added to db successfully!",
+								  	 	   f"[WARNING] Add UUID \"{uuid}\" error!")
 
-		except Exception as e:
-			print(f"[WARNING] Add UUID \"{uuid}\" error!\n{e}")
 ###
 	async def setPeopleCount(self, count: int):
-		try:
-			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
-			async with connection.transaction():
-				await connection.execute(f"""UPDATE "{self._table}" \
-											 SET count = {count} \
-											 WHERE uuid = '{self._current_uuid}';
-										  """)
-				print(f"[INFO] People count \"{count}\"->\"{self._current_uuid}\" added to db successfully!")
-
-		except Exception as e:
-			print(f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!\n{e}")
+		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+											  SET count = {count} \
+									    	  WHERE uuid = '{self._current_uuid}';
+									 	   """,
+									 	   f"[INFO] People count \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
+									 	   f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!")
 ###
 	async def setBusNumber(self, number: str):
-		try:
-			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
-			async with connection.transaction():
-				await connection.execute(f"""UPDATE "{self._table}" \
-										   	 SET bus_number = '{number}' \
-										   	 WHERE uuid = '{self._current_uuid}';
-										  """)
-				print(f"[INFO] Bus number \"{number}\"->\"{self._current_uuid}\" added to db successfully!")
-
-		except Exception as e:
-			print(f"[WARNING] Add bus number \"{number}\"->\"{self._current_uuid}\" error!\n{e}")
+		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+									  	 	  SET bus_number = '{number}' \
+									  		  WHERE uuid = '{self._current_uuid}';
+									 	   """,
+									 	   f"[INFO] Bus number \"{number}\"->\"{self._current_uuid}\" added to db successfully!",
+									 	   f"[WARNING] Add bus number \"{number}\"->\"{self._current_uuid}\" error!")
 ###
 	async def setTime(self, time: str):
-		try:
-			connection = await asyncpg.connect(host=self._host, port=self._port, user=self._user, password=self._password)
-			async with connection.transaction():
-				await connection.execute(f"""UPDATE "{self._table}" \
-										   	 SET time = '{time}' \
-										   	 WHERE uuid = '{self._current_uuid}';
-										  """)
-				print(f"[INFO] Time \"{time}\"->\"{self._current_uuid}\" added to db successfully!")
+		await self.__DBTrabsactionExecute(f"""UPDATE "{self._table}" \
+									   		  SET time = '{time}' \
+									   		  WHERE uuid = '{self._current_uuid}';
+									 	   """, 
+									 	   f"[INFO] Time \"{time}\"->\"{self._current_uuid}\" added to db successfully!", 
+									 	   f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!")
 
-		except Exception as e:
-			print(f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!\n{e}")
 ##############################
 
 	async def addAllCNT(self, count: int, number: str, time: str):
