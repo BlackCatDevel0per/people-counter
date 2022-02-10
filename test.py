@@ -12,9 +12,11 @@ loop = asyncio.get_event_loop()
 
 uuid = generate_uuid()
 
-loop.run_until_complete(SQLite().addUUID(uuid))
-loop.run_until_complete(SQLite(uuid=uuid).setPeopleCount(15))
-loop.run_until_complete(SQLite(uuid=uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
+loop.run_until_complete(SQLite().addAllCNT(15, "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
+
+#loop.run_until_complete(SQLite().addUUID(uuid))
+#loop.run_until_complete(SQLite(uuid=uuid).setPeopleCount(15))
+#loop.run_until_complete(SQLite(uuid=uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
 #loop.run_until_complete(SQLite().createTable("local"))
 
 

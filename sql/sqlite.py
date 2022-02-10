@@ -65,3 +65,12 @@ class SQLite:
 							    """, 
 	   f"[INFO] Time \"{time}\"->\"{self._current_uuid}\" added to db successfully!", 
 	   f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!")
+
+	async def addAllCNT(self, count: int, number: str, time: str):
+		try:
+			await self.addUUID(self._current_uuid)
+			await self.setPeopleCount(count)
+			await self.setTime(time)
+			print("[INFO] DONE!")
+		except Exception as e:
+			print(f"[FAIL!] Add count, bus_number, time \"{count, number, time}\"->\"{self._current_uuid}\" failed!\n{e}")
