@@ -4,7 +4,7 @@ from sql import PGSQL
 from sql import SQLite
 from sql import generate_uuid
 
-from utils import PGR
+from utils.tasks import PGR
 
 import time
 
@@ -14,14 +14,17 @@ loop = asyncio.get_event_loop()
 
 uuid = generate_uuid()
 
-loop.run_until_complete(PGR(3))
+loop.run_until_complete(PGR(5))
+#print(Config().get("bus_number"))
+
+#loop.run_until_complete(PGSQL().addAllCNT((2, 9, 7), "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))
+#loop.run_until_complete(SQLite().addAllCNT((15, 20, 5), time.strftime("%d.%m.%Y | %H:%M:%S")))
 
 #loop.run_until_complete(PGSQL().addUUID(uuid))
 #loop.run_until_complete(PGSQL(uuid=uuid).setPeopleCount_up(16))
 #loop.run_until_complete(PGSQL(uuid=uuid).setPeopleCount_down(16))
 #loop.run_until_complete(PGSQL(uuid=uuid).setPeopleCount(0))
 
-#loop.run_until_complete(SQLite().addAllCNT(15, time.strftime("%d.%m.%Y | %H:%M:%S")))
 
 #loop.run_until_complete(SQLite().createTable("local"))
 #loop.run_until_complete(SQLite().addUUID(uuid))

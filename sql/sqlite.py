@@ -40,65 +40,97 @@ class SQLite:
 
 	async def createTable(self, name: str):
 		# No bus number
-		await self.__DBExecute(f"""CREATE TABLE {name} \
-											  (\
-											  uuid VARCHAR(38) PRIMARY KEY, \
-											  count INTEGER, \
-											  count_up INTEGER, \
-											  count_down INTEGER, \
-											  time VARCHAR(32) \
+		await self.__DBExecute(f"""CREATE TABLE {name} 
+											  (
+											  uuid VARCHAR(38) PRIMARY KEY, 
+											  count INTEGER, 
+											  count_up INTEGER, 
+											  count_down INTEGER, 
+											  time VARCHAR(32) 
 											  );""",
 											  f"[INFO] Table \"{name}\" created successfully!",
 											  f"[WARNING] Create table \"{name}\" error!")
 
 	async def addUUID(self, uuid: str):
-		await self.__DBExecute(f"""INSERT INTO "{self._table}" \
-								   (uuid) VALUES ('{uuid}');\
+		await self.__DBExecute(f"""INSERT INTO "{self._table}" 
+								   (uuid) VALUES ('{uuid}');
 								""",
 		f"[INFO] UUID: \"{uuid}\" added to db successfully!",
 		f"[WARNING] Add UUID \"{uuid}\" error!")
 
 	async def setPeopleCount(self, count: int):
-		await self.__DBExecute(f"""UPDATE "{self._table}" \
-								   SET count = {count} \
+		await self.__DBExecute(f"""UPDATE "{self._table}" 
+								   SET count = {count} 
 								   WHERE uuid = '{self._current_uuid}';
 								""",
 	   f"[INFO] People count \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
 	   f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!")
 
 	async def setPeopleCount_up(self, count: int):
-		await self.__DBExecute(f"""UPDATE "{self._table}" \
-								   SET count_up = {count} \
+		await self.__DBExecute(f"""UPDATE "{self._table}" 
+								   SET count_up = {count} 
 								   WHERE uuid = '{self._current_uuid}';
 								""",
-	   f"[INFO] People count \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
+	   f"[INFO] People count (UP) \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
 	   f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!")
 
 	async def setPeopleCount_down(self, count: int):
-		await self.__DBExecute(f"""UPDATE "{self._table}" \
-								   SET count_down = {count} \
+		await self.__DBExecute(f"""UPDATE "{self._table}" 
+								   SET count_down = {count} 
 								   WHERE uuid = '{self._current_uuid}';
 								""",
-	   f"[INFO] People count \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
+	   f"[INFO] People count (DOWN) \"{count}\"->\"{self._current_uuid}\" added to db successfully!",
 	   f"[WARNING] Add people count \"{count}\"->\"{self._current_uuid}\" error!")
 
 	async def setTime(self, time: str):
-		await self.__DBExecute(f"""UPDATE "{self._table}" \
-								   SET time = '{time}' \
+		await self.__DBExecute(f"""UPDATE "{self._table}" 
+								   SET time = '{time}' 
 								   WHERE uuid = '{self._current_uuid}';
 							    """, 
 	   f"[INFO] Time \"{time}\"->\"{self._current_uuid}\" added to db successfully!", 
 	   f"[WARNING] Add btime \"{time}\"->\"{self._current_uuid}\" error!")
 
-"""
-	async def addAllCNT(self, count: tuple = None, time: str = None):
+
+	async def ___addAllCNT(self, count: tuple = None, time: str = None): ###########
 		try:
-			count_up, count_down = count
+			assert len(count) == 3, "Кортеж count должен состоять из 3 значений!"
+
+			cdown, cup, call = count
+			
+			Auuid = 					f"""INSERT INTO "{self._table}" 
+								     		  (uuid) VALUES ('{self._current_uuid}');
+								  	 	"""
+			
+			Acall = 					f"""UPDATE "{self._table}" 
+											  SET count = {call} 
+									    	  WHERE uuid = '{self._current_uuid}';
+									 	"""
+			
+			Acup = 					f"""UPDATE "{self._table}" 
+											  SET count_up = {cup} 
+											  WHERE uuid = '{self._current_uuid}';
+										"""
+			
+			Acdown = 					f"""UPDATE "{self._table}"
+											  SET count_down = {cdown} 
+											  WHERE uuid = '{self._current_uuid}';
+										"""
+			
+			Atime = 					f"""UPDATE "{self._table}" 
+									   		  SET time = '{time}' 
+									   		  WHERE uuid = '{self._current_uuid}';
+									 	"""
+
+			await self.__DBExecute(f"{Auuid}\n {Acall}\n {Acup}\n {Acdown}\n {Atime}".replace("None", "0"))
+
+			"""
 			await self.addUUID(self._current_uuid)
-			if count_up != None: await self.setPeopleCount_up(count_up)
-			if count_down != None: await self.setPeopleCount_down(count_down)
+			await self.setPeopleCount(call)
+			await self.setPeopleCount_up(cup)
+			await self.setPeopleCount_down(cdown)
 			await self.setTime(time)
-			print("[INFO] DONE!")
+			"""
+
+			print("[INFO] AllCNT SQLite3 DONE!")
 		except Exception as e:
-			print(f"[FAIL!] Add count, bus_number, time \"{count, time}\"->\"{self._current_uuid}\" failed!\n{e}")
-"""
+			print(f"[FAIL!] Add count, bus_number, time \"{count, time}\"->\"{self._current_uuid}\" to local db failed!\n{e}")

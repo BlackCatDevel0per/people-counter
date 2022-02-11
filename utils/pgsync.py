@@ -2,7 +2,6 @@ import asyncio
 import asyncpg
 import aiosqlite
 from config import Config
-import time
 
 _host = Config().PostgreSQL("host")
 _port = Config().PostgreSQL("port")
@@ -11,11 +10,11 @@ _password = Config().PostgreSQL("password")
 
 _table = Config().PostgreSQL("table")
 
-_bus_num = "777777t"
+_bus_num = Config().get("bus_number")
 
-async def __DBTransactionExecuteSync(request):
+async def DBTransactionExecuteSync(request):
+	connection = await asyncpg.connect(host=_host, port=_port, user=_user, password=_password)
 	try:
-		connection = await asyncpg.connect(host=_host, port=_port, user=_user, password=_password)
 		async with connection.transaction():
 			await connection.execute(f"""
 				INSERT INTO {_table} (
@@ -38,7 +37,7 @@ async def __DBTransactionExecuteSync(request):
 		#print("[DEBUG] Close connection")
 		await connection.close()
 
-async def __GetLocalData():
+async def GetLocalData():
 	try:
 		request = ""
 		async with aiosqlite.connect(Config().SQLite("db")) as db:
@@ -56,13 +55,3 @@ async def __GetLocalData():
 
 	except Exception as e:
 		print(e)
-
-async def PGR(time_):
-	while True:
-		time.sleep(time_)
-		
-		request = await __GetLocalData()
-		#print(request)
-		await __DBTransactionExecuteSync(request)
-		print("[INFO] Local sqlite3 db sync with remote PostgreSQL")
-

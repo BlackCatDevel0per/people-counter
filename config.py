@@ -31,6 +31,7 @@ class Config:
         obj_number_font_size = float(self.config["OBJECT"]["obj_number_font_size"])
 
         send_count_interval = int(self.config["DB"]["send_count_interval"])
+        bus_number = str(self.config["DB"]["bus_number"])
 
         data = eval(args) # Return result like a dictonary
 

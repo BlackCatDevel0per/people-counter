@@ -28,10 +28,11 @@ print("Red line y:", str(line_down))
 print("Blue line y:", str(line_up))
 
 from sql import SQLite
-from utils import PGR
 import time
 
 import asyncio
+
+import utils
 
 while stream.isOpened():
 	# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):

@@ -1,1 +1,2 @@
-from .PGrequest_task import PGR
+from .pgsync import GetLocalData, DBTransactionExecuteSync
+from . import tasks
