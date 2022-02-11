@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from config import Config
 
+from sql import generate_uuid
+
 # Size properties
 ##stream.set(3, 160) #Width
 ##stream.set(4, 120) #Height
@@ -91,3 +93,6 @@ cnt_down = 0
 # fps vars
 prev_frame_time = 0
 new_frame_time = 0
+
+#
+current_uuid = generate_uuid()

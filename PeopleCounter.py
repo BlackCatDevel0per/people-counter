@@ -12,6 +12,7 @@ import cv2
 stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
 from nonloopvars import persons, pid, max_p_age
+from nonloopvars import current_uuid
 from nonloopvars import log
 from frames import vidops
 from frames import binarize
@@ -26,7 +27,11 @@ from nonloopvars import line_down, line_up
 print("Red line y:", str(line_down))
 print("Blue line y:", str(line_up))
 
-#from sql import PGSQL
+from sql import SQLite
+from utils import PGR
+import time
+
+import asyncio
 
 while stream.isOpened():
 	# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -56,9 +61,17 @@ while stream.isOpened():
 	# Возвращает в переменные is_up, is_down True, если объект пересёк линию
 	frame, is_up, is_down = detect(frame, mask2, persons, pid, max_p_age)
 	if is_up:
+		# Add how many outsided bus
 		cnt_up += 1
+		asyncio.run(SQLite().addUUID(current_uuid))
+		asyncio.run(SQLite(uuid=current_uuid).setPeopleCount_up(cnt_up))
+		asyncio.run(SQLite(uuid=current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
 	elif is_down:
+		# Add how many insided bus
 		cnt_down += 1
+		asyncio.run(SQLite().addUUID(current_uuid))
+		asyncio.run(SQLite(uuid=current_uuid).setPeopleCount_down(cnt_down))
+		asyncio.run(SQLite(uuid=current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
 
 	# Рисование линий счётчика (на его работу не влияет)
 	frame = InfoDraw.lines(frame)
@@ -74,6 +87,8 @@ while stream.isOpened():
 
 	if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
 		break
+
+asyncio.run(SQLite(uuid=current_uuid).setPeopleCount(cnt_down - cnt_up))
 
 ###############
 #   Очистка   #
