@@ -1,6 +1,7 @@
 env/
 old/
 src/local.db
+show_frames.py
 src/data/PostgreSQL.ini
 log.txt
 __pycache__

@@ -7,7 +7,7 @@ import cv2
 # Источник видео
 #stream = cv2.VideoCapture(0)
 
-# stream = cv2.VideoCapture("http://192.168.1.104:4747/video") # DroidCamX
+#stream = cv2.VideoCapture("http://192.168.1.104:4747/video") # DroidCamX
 #stream = cv2.VideoCapture('Test Files/TestVideo.avi')
 stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
@@ -49,6 +49,9 @@ class App:
 		self.new_frame_time = new_frame_time
 		#self.line_down = line_down
 		self.line_up = line_up
+
+		#self.skip_frame_count = 5 # starts from than frame number
+		#stream.set(cv2.CAP_PROP_POS_FRAMES, self.skip_frame_count)
 
 	async def Counter_win(self):
 
@@ -99,6 +102,7 @@ class App:
 				self.cnt_all += 1
 				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
 
+
 			# Рисование линий счётчика (на его работу не влияет)
 			frame = InfoDraw.lines(frame)
 			# Рисование счётчиков UP и DOWN
@@ -108,7 +112,7 @@ class App:
 				frame, (self.prev_frame_time, self.new_frame_time))
 
 			# Вывод кадров
-			cv2.imshow('Stream', frame)
+			#cv2.imshow('Stream', frame)
 			#cv2.imshow('Mask', mask)
 
 			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
@@ -124,7 +128,7 @@ class App:
 
 		stream.release()
 		cv2.destroyAllWindows()
-
+"""
 	async def Counter_console(self):
 
 		while stream.isOpened():
@@ -183,6 +187,7 @@ class App:
 
 		stream.release()
 		cv2.destroyAllWindows()
+"""
 
-#asyncio.run(App().Counter_win())
-asyncio.run(App().Counter_console())
+asyncio.run(App().Counter_win())
+#asyncio.run(App().Counter_console())
