@@ -173,9 +173,6 @@ class App:
 				self.cnt_all += 1
 				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
 
-			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
-				break
-
 		#await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
 
 		###############
@@ -187,5 +184,5 @@ class App:
 		stream.release()
 		cv2.destroyAllWindows()
 
-asyncio.run(App().Counter_win())
-#asyncio.run(App().Counter_console())
+#asyncio.run(App().Counter_win())
+asyncio.run(App().Counter_console())
