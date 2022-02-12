@@ -87,6 +87,7 @@ max_p_age = 5
 pid = 1
 
 # People count vars
+cnt_all = 0
 cnt_up = 0
 cnt_down = 0
 

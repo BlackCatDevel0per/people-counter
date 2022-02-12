@@ -20,7 +20,7 @@ from frames import detect
 from frames import InfoDraw
 
 # Импорт переменных счётчиков
-from nonloopvars import cnt_up, cnt_down
+from nonloopvars import cnt_up, cnt_down, cnt_all
 from nonloopvars import prev_frame_time, new_frame_time
 
 from nonloopvars import line_down, line_up
@@ -44,12 +44,13 @@ class App:
 		self.log = log
 		self.cnt_up = cnt_up
 		self.cnt_down = cnt_down
+		self.cnt_all = cnt_all # count inside bus
 		self.prev_frame_time = prev_frame_time
 		self.new_frame_time = new_frame_time
 		#self.line_down = line_down
 		self.line_up = line_up
 
-	async def Counter(self):
+	async def Counter_win(self):
 
 		while stream.isOpened():
 			# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -84,12 +85,19 @@ class App:
 				await SQLite().addUUID(self.current_uuid)
 				await SQLite(uuid=self.current_uuid).setPeopleCount_up(self.cnt_up)
 				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
+
+				self.cnt_all -= 1
+				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
+
 			elif is_down:
 				# Add how many insided bus
 				self.cnt_down += 1
 				await SQLite().addUUID(self.current_uuid)
 				await SQLite(uuid=self.current_uuid).setPeopleCount_down(self.cnt_down)
 				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
+
+				self.cnt_all += 1
+				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
 
 			# Рисование линий счётчика (на его работу не влияет)
 			frame = InfoDraw.lines(frame)
@@ -106,7 +114,7 @@ class App:
 			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
 				break
 
-		await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
+		#await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
 
 		###############
 		#   Очистка   #
@@ -117,4 +125,67 @@ class App:
 		stream.release()
 		cv2.destroyAllWindows()
 
-asyncio.run(App().Counter())
+	async def Counter_console(self):
+
+		while stream.isOpened():
+			# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+			# Чтение кадра из источника видео stream
+			grabbed, frame = stream.read()
+			if not grabbed:
+				break
+			#frame = image.array
+
+			frame = vidops(frame)
+
+			for i in self.persons:  # Слежение выхода за кадр каждого объекта за кадр
+				i.age_one()
+
+			# Преобразование в бинарный формат для удаления теней
+			#frame, mask, mask2 = binarize(frame, grabbed)
+			try:
+				# Преобразование в бинарный формат для удаления теней
+				frame, mask, mask2 = binarize(frame, grabbed)
+			except Exception as e:
+				print('EOF') ###
+				print('ВЫШЛО:', self.cnt_up)
+				print('ЗАШЛО:', self.cnt_down)
+				print(e)
+				break
+
+			# Возвращает в переменные is_up, is_down True, если объект пересёк линию
+			frame, is_up, is_down = detect(frame, mask2, self.persons, self.pid, self.max_p_age)
+			if is_up:
+				# Add how many outsided bus
+				self.cnt_up += 1
+				await SQLite().addUUID(self.current_uuid)
+				await SQLite(uuid=self.current_uuid).setPeopleCount_up(self.cnt_up)
+				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
+
+				self.cnt_all -= 1
+				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
+			elif is_down:
+				# Add how many insided bus
+				self.cnt_down += 1
+				await SQLite().addUUID(self.current_uuid)
+				await SQLite(uuid=self.current_uuid).setPeopleCount_down(self.cnt_down)
+				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
+				
+				self.cnt_all += 1
+				await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_all) # Add data after loop break
+
+			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
+				break
+
+		#await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
+
+		###############
+		#   Очистка   #
+		###############
+		self.log.flush()
+		self.log.close()
+
+		stream.release()
+		cv2.destroyAllWindows()
+
+asyncio.run(App().Counter_win())
+#asyncio.run(App().Counter_console())
