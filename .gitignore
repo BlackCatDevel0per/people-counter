@@ -1,5 +1,6 @@
 env/
 old/
+src/local.db
 src/data/PostgreSQL.ini
 log.txt
 __pycache__
