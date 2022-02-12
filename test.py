@@ -19,7 +19,7 @@ uuid = generate_uuid()
 
 #loop.run_until_complete(CleanLocalDB_after(24*60))
 
-#loop.run_until_complete(PGR_after(5))
+loop.run_until_complete(PGR_after(5))
 #loop.run_until_complete(PGR_after(5))
 #print(Config().get("bus_number"))
 
