@@ -7,13 +7,13 @@ pip install -r requirements.txt
 ```
 All settings in src/data
 (virtualenv)
-Linux
+### Linux
 ```
 pip install virtualenv
 python -m virtualenv venv
 source venv/bin/activate
 ```
-Windows
+### Windows
 ```
 pip install virtualenv
 python -m virtualenv venv
