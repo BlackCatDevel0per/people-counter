@@ -84,7 +84,8 @@ class Config:
         self.config.read(self.SQLite_File)
         data = None
 
-        db = str(self.config["SQLite"]["db"])
+        db_file = str(self.config["SQLite"]["db"])
+        db = os.path.join(self.app_path, 'src', db_file)
         table = str(self.config["SQLite"]["table"])
 
         #user = str(self.config["SQLite"]["user"])
