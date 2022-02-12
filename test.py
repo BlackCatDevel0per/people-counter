@@ -4,7 +4,10 @@ from sql import PGSQL
 from sql import SQLite
 from sql import generate_uuid
 
-from utils.tasks import PGR
+#from utils import DBTransactionExecuteSync
+from utils.tasks import PGR_after
+from utils import CleanLocalDB
+from utils.tasks import CleanLocalDB_after
 
 import time
 
@@ -14,7 +17,10 @@ loop = asyncio.get_event_loop()
 
 uuid = generate_uuid()
 
-loop.run_until_complete(PGR(5))
+#loop.run_until_complete(CleanLocalDB_after(24*60))
+
+#loop.run_until_complete(PGR_after(5))
+#loop.run_until_complete(PGR_after(5))
 #print(Config().get("bus_number"))
 
 #loop.run_until_complete(PGSQL().addAllCNT((2, 9, 7), "E777", time.strftime("%d.%m.%Y | %H:%M:%S")))

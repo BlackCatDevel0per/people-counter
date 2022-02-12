@@ -3,7 +3,7 @@ import time
 
 from .. import GetLocalData, DBTransactionExecuteSync
 
-async def PGR(timer: int):
+async def PGR_after(timer: int):
 	while True:
 		time.sleep(timer)
 		
