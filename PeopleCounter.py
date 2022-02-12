@@ -2,7 +2,7 @@
 ##from picamera import PiCamera
 import cv2
 
-# Изменение настроек не применяются во время работы программы
+# Изменение настроек не применяются во время работы программы (требуется перезапуск)
 
 # Источник видео
 #stream = cv2.VideoCapture(0)
@@ -34,68 +34,87 @@ import asyncio
 
 import utils
 
-while stream.isOpened():
-	# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-	# Чтение кадра из источника видео stream
-	grabbed, frame = stream.read()
-	if not grabbed:
-		break
-	#frame = image.array
+class App:
 
-	frame = vidops(frame)
+	def __init__(self):
+		self.persons = persons
+		self.pid = pid
+		self.max_p_age = max_p_age
+		self.current_uuid = current_uuid
+		self.log = log
+		self.cnt_up = cnt_up
+		self.cnt_down = cnt_down
+		self.prev_frame_time = prev_frame_time
+		self.new_frame_time = new_frame_time
+		#self.line_down = line_down
+		self.line_up = line_up
 
-	for i in persons:  # Слежение выхода за кадр каждого объекта за кадр
-		i.age_one()
+	async def Counter(self):
 
-	# Преобразование в бинарный формат для удаления теней
-	#frame, mask, mask2 = binarize(frame, grabbed)
-	try:
-		# Преобразование в бинарный формат для удаления теней
-		frame, mask, mask2 = binarize(frame, grabbed)
-	except Exception as e:
-		print('EOF') ###
-		print('ВЫШЛО:', cnt_up)
-		print('ЗАШЛО:', cnt_down)
-		print(e)
-		break
+		while stream.isOpened():
+			# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+			# Чтение кадра из источника видео stream
+			grabbed, frame = stream.read()
+			if not grabbed:
+				break
+			#frame = image.array
 
-	# Возвращает в переменные is_up, is_down True, если объект пересёк линию
-	frame, is_up, is_down = detect(frame, mask2, persons, pid, max_p_age)
-	if is_up:
-		# Add how many outsided bus
-		cnt_up += 1
-		asyncio.run(SQLite().addUUID(current_uuid))
-		asyncio.run(SQLite(uuid=current_uuid).setPeopleCount_up(cnt_up))
-		asyncio.run(SQLite(uuid=current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
-	elif is_down:
-		# Add how many insided bus
-		cnt_down += 1
-		asyncio.run(SQLite().addUUID(current_uuid))
-		asyncio.run(SQLite(uuid=current_uuid).setPeopleCount_down(cnt_down))
-		asyncio.run(SQLite(uuid=current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S")))
+			frame = vidops(frame)
 
-	# Рисование линий счётчика (на его работу не влияет)
-	frame = InfoDraw.lines(frame)
-	# Рисование счётчиков UP и DOWN
-	frame = InfoDraw.count(frame, cnt_up, cnt_down)
-	# Переменные для работы счётчика fps
-	new_frame_time, prev_frame_time = InfoDraw.fps(
-		frame, (prev_frame_time, new_frame_time))
+			for i in self.persons:  # Слежение выхода за кадр каждого объекта за кадр
+				i.age_one()
 
-	# Вывод кадров
-	cv2.imshow('Stream', frame)
-	#cv2.imshow('Mask', mask)
+			# Преобразование в бинарный формат для удаления теней
+			#frame, mask, mask2 = binarize(frame, grabbed)
+			try:
+				# Преобразование в бинарный формат для удаления теней
+				frame, mask, mask2 = binarize(frame, grabbed)
+			except Exception as e:
+				print('EOF') ###
+				print('ВЫШЛО:', self.cnt_up)
+				print('ЗАШЛО:', self.cnt_down)
+				print(e)
+				break
 
-	if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
-		break
+			# Возвращает в переменные is_up, is_down True, если объект пересёк линию
+			frame, is_up, is_down = detect(frame, mask2, self.persons, self.pid, self.max_p_age)
+			if is_up:
+				# Add how many outsided bus
+				self.cnt_up += 1
+				await SQLite().addUUID(self.current_uuid)
+				await SQLite(uuid=self.current_uuid).setPeopleCount_up(self.cnt_up)
+				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
+			elif is_down:
+				# Add how many insided bus
+				self.cnt_down += 1
+				await SQLite().addUUID(self.current_uuid)
+				await SQLite(uuid=self.current_uuid).setPeopleCount_down(self.cnt_down)
+				await SQLite(uuid=self.current_uuid).setTime(time.strftime("%d.%m.%Y | %H:%M:%S"))
 
-asyncio.run(SQLite(uuid=current_uuid).setPeopleCount(cnt_down - cnt_up))
+			# Рисование линий счётчика (на его работу не влияет)
+			frame = InfoDraw.lines(frame)
+			# Рисование счётчиков UP и DOWN
+			frame = InfoDraw.count(frame, self.cnt_up, self.cnt_down)
+			# Переменные для работы счётчика fps
+			self.new_frame_time, self.prev_frame_time = InfoDraw.fps(
+				frame, (self.prev_frame_time, self.new_frame_time))
 
-###############
-#   Очистка   #
-###############
-log.flush()
-log.close()
+			# Вывод кадров
+			cv2.imshow('Stream', frame)
+			#cv2.imshow('Mask', mask)
 
-stream.release()
-cv2.destroyAllWindows()
+			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
+				break
+
+		await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
+
+		###############
+		#   Очистка   #
+		###############
+		self.log.flush()
+		self.log.close()
+
+		stream.release()
+		cv2.destroyAllWindows()
+
+asyncio.run(App().Counter())

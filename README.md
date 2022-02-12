@@ -29,3 +29,6 @@ python PeopleCounter.py
 - [ ] web interface
 - [ ] Update system, distributing and etc.
 - [ ] Multi person detection
+- [ ] Run in PyPy (opencv)
+- [ ] Logging
+Other things..
