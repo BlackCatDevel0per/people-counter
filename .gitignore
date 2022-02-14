@@ -1,4 +1,4 @@
-env/
+venv/
 old/
 src/local.db
 show_frames.py

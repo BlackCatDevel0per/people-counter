@@ -1,16 +1,16 @@
 import asyncio
-import time
 
 from .. import GetLocalData, DBTransactionExecuteSync
 
 async def PGR_after(timer: int):
 	while True:
-		time.sleep(timer)
 		
 		try:
+			await asyncio.sleep(timer)
 			request = await GetLocalData()
-			#print(request)
+			assert request != "", "[DEBUG] Local db is clear, no data to request"
 			await DBTransactionExecuteSync(request)
+			#print(request)
 			print("[INFO] Local sqlite3 db sync with remote PostgreSQL")
 		except Exception as e:
 			print(e)

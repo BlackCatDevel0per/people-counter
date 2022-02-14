@@ -18,10 +18,10 @@ loop = asyncio.get_event_loop()
 uuid = generate_uuid()
 
 #loop.run_until_complete(CleanLocalDB_after(24*60))
-loop.run_until_complete(CleanLocalDB_after(5))
+#loop.run_until_complete(CleanLocalDB_after(5))
 #loop.run_until_complete(CleanLocalDB())
 
-#loop.run_until_complete(PGR_after(5))
+loop.run_until_complete(PGR_after(5))
 #loop.run_until_complete(PGR_after(10))
 #print(Config().get("bus_number"))
 
