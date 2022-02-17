@@ -5,3 +5,5 @@ from .obj_info_drawing import ObjInfoDraw
 from .detection import detect
 
 from .info_drawing import InfoDraw
+
+from .sleep_motion import SleepMotion
