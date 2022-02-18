@@ -1,6 +1,6 @@
 import cv2
 import time
-from nonloopvars import areaTH, up_limit, down_limit, line_down, line_up, log
+from nonloopvars import areaTH, up_limit, down_limit, line_down, line_up#, log
 import Person
 
 from .obj_info_drawing import ObjInfoDraw
@@ -39,11 +39,11 @@ def detect(frame, mask2, persons, pid, max_p_age):
 						if i.going_UP(line_down, line_up) == True:
 							is_up = True
 							print("ID:", i.getId(), 'ВЫШЕЛ В -', time.strftime("%c"))
-							log.write("ID: " + str(i.getId()) + 'ВЫШЕЛ В -' + time.strftime("%c") + '\n')
+							#log.write("ID: " + str(i.getId()) + 'ВЫШЕЛ В -' + time.strftime("%c") + '\n')
 						elif i.going_DOWN(line_down, line_up) == True:
 							is_down = True
 							print( "ID:", i.getId(), 'ВОШЕЛ В -', time.strftime("%c"))
-							log.write("ID: " + str(i.getId()) + 'ВОШЕЛ В -' + time.strftime("%c") + '\n')
+							#log.write("ID: " + str(i.getId()) + 'ВОШЕЛ В -' + time.strftime("%c") + '\n')
 						break
 					if i.getState() == '1':
 						if i.getDir() == 'down' and i.getY() > down_limit:

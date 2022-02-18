@@ -15,12 +15,6 @@ from sql import generate_uuid
 ##rawCapture = PiRGBArray(camera, size=(160, 120))
 ##time.sleep(0.1)
 
-# Open logfile
-try:
-	log = open('log.txt', "w")
-except:
-	print("Не удалось открыть лог")
-
 # Печать свойств захвата в консоль
 #for i in range(19):
 #	print(i, stream.get(i))
@@ -51,6 +45,12 @@ line_up_bcolor = Config().get("line_up_bcolor")
 rectangle_color = Config().get("rectangle_color")
 rectangle_thickness = Config().get("rectangle_thickness")
 obj_number_font_size = Config().get("obj_number_font_size")
+
+# Other Options
+sleep_time_minutes = Config().get("sleep_time_minutes")
+sleep_motion_sensitivity = Config().get("sleep_motion_sensitivity")
+mdt = Config().get("mdt")
+sleep_enable = Config().get("sleep_enable")
 
 pt1 = [0, line_down]
 pt2 = [w, line_down]
@@ -97,3 +97,4 @@ new_frame_time = 0
 
 #
 current_uuid = generate_uuid()
+new_current_uuid = generate_uuid

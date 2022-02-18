@@ -32,6 +32,11 @@ class Config:
 
         send_count_interval = int(self.config["DB"]["send_count_interval"])
         bus_number = str(self.config["DB"]["bus_number"])
+        
+        sleep_enable = eval(self.config["OTHERS"]["sleep_enable"])
+        sleep_time_minutes = int(self.config["OTHERS"]["sleep_time_minutes"])
+        sleep_motion_sensitivity = int(self.config["OTHERS"]["sleep_motion_sensitivity"])
+        mdt = int(self.config["OTHERS"]["minimal_detection_times"])
 
         data = eval(args) # Return result like a dictonary
 
