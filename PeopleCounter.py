@@ -21,8 +21,6 @@ from nonloopvars import sleep_time_minutes, sleep_motion_sensitivity
 from nonloopvars import mdt, sleep_enable
 
 from nonloopvars import line_down, line_up
-print("Red line y:", str(line_down))
-print("Blue line y:", str(line_up))
 
 from sql import SQLite
 import time
@@ -36,6 +34,7 @@ import schedule
 class App:
 
 	def __init__(self, stream):
+		self.stream = stream
 		self.persons = persons
 		self.pid = pid
 		self.max_p_age = max_p_age
@@ -58,6 +57,9 @@ class App:
 		#self.sleep_enable = sleep_enable
 		sleep_time = sleep_time_minutes
 
+		print("Red line y:", str(line_down))
+		print("Blue line y:", str(line_up))
+		
 		if sleep_enable and sleep_time != 0:
 			print("[INFO COUNTER] Sleep mode enabled!")
 			#sleep_time = 0
@@ -66,7 +68,7 @@ class App:
 
 		# SM
 		###
-		frame1 = stream.read()[1]
+		frame1 = self.stream.read()[1]
 		frame1 = vidops(frame1)
 		#frame1 = vidops(frame1, True)
 		gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
@@ -77,7 +79,7 @@ class App:
 		###
 
 		#self.skip_frame_count = 5 # starts from than frame number
-		#stream.set(cv2.CAP_PROP_POS_FRAMES, self.skip_frame_count) # set skip frame
+		#self.stream.set(cv2.CAP_PROP_POS_FRAMES, self.skip_frame_count) # set skip frame
 
 	def CSETF(self):
 		if self.cnt_up == 0 and self.cnt_down == 0 and self.cnt_all == 0:
@@ -96,10 +98,10 @@ class App:
 
 	async def Counter(self):
 
-		while stream.isOpened():
+		while self.stream.isOpened():
 			# for image in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-			# Чтение кадра из источника видео stream
-			grabbed, frame = stream.read()
+			# Чтение кадра из источника видео self.stream
+			grabbed, frame = self.stream.read()
 			if not grabbed:
 				break
 			#frame = image.array
@@ -178,7 +180,7 @@ class App:
 			if cv2.waitKey(1) & 0xFF == ord('q'):  # Завершение цикла на 'q'
 				break
 
-		#if not stream.isOpened() and self.counting == False:
+		#if not self.stream.isOpened() and self.counting == False:
 		#	return False
 
 		#await SQLite(uuid=self.current_uuid).setPeopleCount(self.cnt_down - self.cnt_up) # Add data after loop break
@@ -189,7 +191,7 @@ class App:
 		#self.log.flush()
 		#self.log.close()
 
-		stream.release()
+		self.stream.release()
 		cv2.destroyAllWindows()
 
 # Источник видео
@@ -197,7 +199,7 @@ class App:
 
 #stream = cv2.VideoCapture("http://192.168.1.104:4747/video") # DroidCamX
 #stream = cv2.VideoCapture('Test Files/TestVideo.avi')
-stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
+#stream = cv2.VideoCapture('Test Files/TestVedeo2.mp4')
 
-asyncio.run(App(stream).Counter())
+#asyncio.run(App(stream).Counter())
 #asyncio.run(App().Counter_console())
